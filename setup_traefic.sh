@@ -4,17 +4,28 @@
 read -p "Entrez le nom de domaine pour le dashboard Traefik (ex: traefik.mondomaine.com) : " TRAEFIK_DOMAIN
 read -p "Entrez le nom de domaine pour le service de test (ex: whoami.mondomaine.com) : " WHOAMI_DOMAIN
 
-# Demander un mot de passe pour le dashboard
-read -s -p "Définissez un mot de passe pour le dashboard Traefik : " PASSWORD
-echo
-read -s -p "Confirmez le mot de passe : " PASSWORD_CONFIRM
-echo
+# Demander un email pour Let's Encrypt
+while true; do
+    read -p "Entrez votre email pour Let's Encrypt (ex: ton@email.com) : " LETSENCRYPT_EMAIL
+    if [[ "$LETSENCRYPT_EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        break
+    else
+        echo "Erreur : l'email n'est pas valide. Veuillez réessayer."
+    fi
+done
 
-# Vérifier que les mots de passe correspondent
-if [ "$PASSWORD" != "$PASSWORD_CONFIRM" ]; then
-    echo "Erreur : les mots de passe ne correspondent pas."
-    exit 1
-fi
+# Demander un mot de passe pour le dashboard
+while true; do
+    read -s -p "Définissez un mot de passe pour le dashboard Traefik : " PASSWORD
+    echo
+    read -s -p "Confirmez le mot de passe : " PASSWORD_CONFIRM
+    echo
+    if [ "$PASSWORD" = "$PASSWORD_CONFIRM" ]; then
+        break
+    else
+        echo "Erreur : les mots de passe ne correspondent pas. Veuillez réessayer."
+    fi
+done
 
 # Générer le hash du mot de passe pour Traefik
 HTPASSWD_HASH=$(htpasswd -nb admin "$PASSWORD" | cut -d: -f2)
@@ -92,7 +103,7 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: ton@email.com  # Remplace par ton email
+      email: $LETSENCRYPT_EMAIL
       storage: /acme.json
       httpChallenge:
         entryPoint: web

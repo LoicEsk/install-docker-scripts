@@ -19,7 +19,7 @@ echo \
 
 # Mise à jour des paquets et installation de Docker
 sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin apache2-utils
 
 # Vérification de l'installation
 sudo docker run hello-world
